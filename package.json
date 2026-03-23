@@ -1,6 +1,7 @@
 {
   "name": "open402",
   "private": true,
+  "packageManager": "pnpm@10.28.1",
   "scripts": {
     "build": "turbo build",
     "test": "turbo test",

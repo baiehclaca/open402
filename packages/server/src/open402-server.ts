@@ -3,12 +3,14 @@ import type { PaymentConfirmation } from '@open402/core'
 import type { PaymentAdapter, ResourcePrice } from './types.js'
 import { InvoiceStore } from './invoice-store.js'
 
+type SigningKey = Awaited<ReturnType<typeof generateSigningKeyPair>>['privateKey']
+
 export class Open402Server {
   private readonly adapters = new Map<string, PaymentAdapter>()
   private readonly resourcePrices = new Map<string, ResourcePrice>()
   private readonly invoiceStore = new InvoiceStore()
-  private privateKey!: CryptoKey
-  private publicKey!: CryptoKey
+  private privateKey!: SigningKey
+  private publicKey!: SigningKey
   private publicKeyJwk!: Record<string, unknown>
   private readonly receiptTtl: number
 

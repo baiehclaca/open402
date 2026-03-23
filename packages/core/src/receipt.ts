@@ -1,19 +1,21 @@
 import { SignJWT, jwtVerify, generateKeyPair, exportJWK } from 'jose'
+import type { KeyLike } from 'jose'
 import type { PaymentConfirmation, PaymentReceipt } from './types.js'
 
 export async function generateSigningKeyPair(): Promise<{
-  privateKey: CryptoKey
-  publicKey: CryptoKey
+  privateKey: KeyLike
+  publicKey: KeyLike
   publicKeyJwk: Record<string, unknown>
 }> {
   const { privateKey, publicKey } = await generateKeyPair('ES256')
-  return { privateKey, publicKey, publicKeyJwk: await exportJWK(publicKey) }
+  const jwk = await exportJWK(publicKey)
+  return { privateKey, publicKey, publicKeyJwk: jwk as unknown as Record<string, unknown> }
 }
 
 export async function buildReceipt(
   confirmation: PaymentConfirmation,
   resource: string,
-  privateKey: CryptoKey,
+  privateKey: KeyLike,
   ttlSeconds = 3600,
 ): Promise<string> {
   const now = Math.floor(Date.now() / 1000)
@@ -34,7 +36,7 @@ export async function buildReceipt(
 
 export async function verifyReceipt(
   jwt: string,
-  publicKey: CryptoKey,
+  publicKey: KeyLike,
 ): Promise<PaymentReceipt | null> {
   try {
     const { payload } = await jwtVerify(jwt, publicKey)
