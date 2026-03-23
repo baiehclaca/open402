@@ -1,0 +1,19 @@
+{
+  "name": "open402",
+  "private": true,
+  "scripts": {
+    "build": "turbo build",
+    "test": "turbo test",
+    "lint": "turbo lint",
+    "dev": "turbo dev"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0",
+    "tsup": "^8.0.0",
+    "@types/node": "^20.0.0",
+    "@types/express": "^4.17.0",
+    "prettier": "^3.0.0"
+  }
+}
