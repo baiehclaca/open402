@@ -30,6 +30,12 @@ importers:
         specifier: ^1.6.0
         version: 1.6.1(@types/node@20.19.37)
 
+  packages/core:
+    dependencies:
+      jose:
+        specifier: ^5.0.0
+        version: 5.10.0
+
 packages:
 
   '@esbuild/aix-ppc64@0.21.5':
@@ -678,6 +684,9 @@ packages:
 
   isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
+
+  jose@5.10.0:
+    resolution: {integrity: sha512-s+3Al/p9g32Iq+oqXxkW//7jk2Vig6FF1CFqzVXoTUXt2qz89YWbL+OwS17NFYEvxC35n0FKeGO2LGYSxeM2Gg==}
 
   joycon@3.1.1:
     resolution: {integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==}
@@ -1503,6 +1512,8 @@ snapshots:
   is-stream@3.0.0: {}
 
   isexe@2.0.0: {}
+
+  jose@5.10.0: {}
 
   joycon@3.1.1: {}
 
