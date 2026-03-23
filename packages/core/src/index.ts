@@ -1,2 +1,4 @@
 export * from './types.js'
-// headers, receipt, discovery will be added in subsequent tasks
+export * from './headers.js'
+export * from './receipt.js'
+export * from './discovery.js'
