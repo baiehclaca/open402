@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>open402 — HTTP finally gets paid</title>
+  <meta name="description" content="An open protocol and TypeScript SDK that finally implements HTTP 402 Payment Required. Any server, any client, any payment method.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:  #000;
+      --dim:  #555;
+      --pale: #999;
+      --rule: #e8e8e8;
+      --code: #f5f5f5;
+      --max:  640px;
+      --mono: 'SFMono-Regular', 'Fira Mono', 'Consolas', 'Menlo', monospace;
+      --sans: system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    html { font-size: 13px; }
+
+    body {
+      background: #fff;
+      color: var(--ink);
+      font-family: var(--sans);
+      line-height: 1.65;
+      padding: 0 24px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Layout ── */
+    .wrap {
+      max-width: var(--max);
+      margin: 0 auto;
+    }
+
+    /* ── Header ── */
+    header {
+      padding: 80px 0 64px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .logotype {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+
+    .headline {
+      margin-top: 28px;
+      font-size: 22px;
+      font-weight: 400;
+      line-height: 1.4;
+      letter-spacing: -.01em;
+      color: var(--ink);
+    }
+
+    .sub {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--dim);
+      max-width: 480px;
+      line-height: 1.7;
+    }
+
+    .cta {
+      margin-top: 28px;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .cta a {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--ink);
+      border-bottom: 1px solid var(--ink);
+      padding-bottom: 1px;
+    }
+
+    .cta a.secondary {
+      color: var(--dim);
+      border-color: var(--dim);
+      font-weight: 400;
+    }
+
+    .cta a:hover { opacity: .6; }
+
+    /* ── Section ── */
+    section {
+      padding: 56px 0;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    section:last-of-type { border-bottom: none; }
+
+    .label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--pale);
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--ink);
+    }
+
+    p {
+      font-size: 13px;
+      color: var(--dim);
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+
+    p:last-child { margin-bottom: 0; }
+
+    /* ── Steps ── */
+    .steps {
+      counter-reset: step;
+      list-style: none;
+      margin-top: 4px;
+    }
+
+    .steps li {
+      counter-increment: step;
+      display: flex;
+      gap: 16px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--rule);
+      font-size: 13px;
+      color: var(--dim);
+      line-height: 1.5;
+    }
+
+    .steps li:last-child { border-bottom: none; }
+
+    .steps li::before {
+      content: counter(step);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--pale);
+      letter-spacing: .04em;
+      min-width: 14px;
+      padding-top: 2px;
+    }
+
+    .steps li strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    /* ── Code ── */
+    .snippet {
+      margin: 20px 0 0;
+    }
+
+    .snippet-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--pale);
+      margin-bottom: 8px;
+    }
+
+    pre {
+      background: var(--code);
+      padding: 18px 20px;
+      overflow-x: auto;
+      border-radius: 2px;
+    }
+
+    code {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      line-height: 1.65;
+      color: var(--ink);
+    }
+
+    p code, li code {
+      background: var(--code);
+      padding: 1px 5px;
+      border-radius: 2px;
+      font-size: 11px;
+      color: var(--ink);
+    }
+
+    /* ── Packages ── */
+    .pkg-list {
+      list-style: none;
+      margin-top: 4px;
+    }
+
+    .pkg-list li {
+      display: flex;
+      gap: 20px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--rule);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .pkg-list li:last-child { border-bottom: none; }
+
+    .pkg-name {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink);
+      min-width: 160px;
+      flex-shrink: 0;
+      padding-top: 1px;
+    }
+
+    .pkg-desc {
+      color: var(--dim);
+    }
+
+    /* ── HTTP flow ── */
+    .flow {
+      margin: 20px 0 0;
+      font-family: var(--mono);
+      font-size: 11px;
+      line-height: 2;
+      color: var(--dim);
+    }
+
+    .flow .arrow { color: var(--pale); }
+    .flow .status { color: var(--ink); font-weight: 600; }
+    .flow .header { color: var(--ink); }
+
+    /* ── Footer ── */
+    footer {
+      padding: 40px 0 64px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    footer span, footer a {
+      font-size: 11px;
+      color: var(--pale);
+      text-decoration: none;
+      letter-spacing: .02em;
+    }
+
+    footer a:hover { color: var(--ink); }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      header { padding: 56px 0 48px; }
+      .headline { font-size: 18px; }
+      .pkg-name { min-width: 120px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ── Header ── -->
+  <header>
+    <div class="logotype">open402</div>
+    <h1 class="headline">HTTP finally gets paid.</h1>
+    <p class="sub">
+      HTTP has reserved the <code>402 Payment Required</code> status since 1991.
+      open402 makes it real — a simple, open protocol and TypeScript SDK that lets
+      any server charge per-request and any client pay transparently.
+      No subscriptions. No API keys. No intermediaries.
+    </p>
+    <div class="cta">
+      <a href="https://github.com/baiehclaca/open402">GitHub</a>
+      <a href="https://github.com/baiehclaca/open402/blob/main/spec/open402.md" class="secondary">Protocol spec</a>
+      <a href="https://github.com/baiehclaca/open402/tree/main/apps/example" class="secondary">Example</a>
+    </div>
+  </header>
+
+  <!-- ── How it works ── -->
+  <section>
+    <div class="label">How it works</div>
+    <ol class="steps">
+      <li><strong>Request</strong> — client requests a paywalled resource</li>
+      <li><strong>402</strong> — server responds with payment headers: amount, currency, methods, endpoint</li>
+      <li><strong>Invoice</strong> — client posts to <code>/.well-known/402/pay</code> to create an invoice</li>
+      <li><strong>Pay</strong> — client pays via their wallet (Lightning, Stripe, USDC…)</li>
+      <li><strong>Poll</strong> — client polls <code>GET /.well-known/402/pay/:id</code> until receipt is ready</li>
+      <li><strong>Receipt</strong> — server issues a self-verifying JWT signed with ES256</li>
+      <li><strong>200</strong> — client retries with <code>Payment-Receipt: &lt;jwt&gt;</code>, server responds</li>
+    </ol>
+  </section>
+
+  <!-- ── Wire format ── -->
+  <section>
+    <div class="label">Wire format</div>
+
+    <h2>Server → Client (402)</h2>
+    <div class="flow">
+      <div><span class="status">HTTP/1.1 402 Payment Required</span></div>
+      <div><span class="header">Payment-Amount:</span>      1000</div>
+      <div><span class="header">Payment-Currency:</span>    BTC</div>
+      <div><span class="header">Payment-Methods:</span>     lightning</div>
+      <div><span class="header">Payment-Description:</span> Premium market data</div>
+      <div><span class="header">Payment-Expiry:</span>      1742003600</div>
+      <div><span class="header">Payment-Endpoint:</span>    https://api.example.com/.well-known/402/pay</div>
+    </div>
+
+    <h2 style="margin-top:28px">Client → Server (retry)</h2>
+    <div class="flow">
+      <div><span class="status">GET /api/data HTTP/1.1</span></div>
+      <div><span class="header">Payment-Receipt:</span>     eyJhbGciOiJFUzI1NiJ9…</div>
+    </div>
+  </section>
+
+  <!-- ── Server quick start ── -->
+  <section>
+    <div class="label">Server</div>
+
+    <div class="snippet">
+      <div class="snippet-label">Express · TypeScript</div>
+      <pre><code>import express from 'express'
+import { Open402Server, createWellKnownRouter, paywall } from '@open402/server'
+
+const app = express()
+app.use(express.json())
+
+const pay402 = new Open402Server()
+await pay402.init()
+
+pay402.registerAdapter(myLightningAdapter)
+app.use('/.well-known/402', createWellKnownRouter(pay402))
+
+app.get(
+  '/api/data',
+  paywall(pay402, { path: '/api/data', amount: 1000, currency: 'BTC' }),
+  (req, res) => res.json({ secret: 'the data' }),
+)</code></pre>
+    </div>
+  </section>
+
+  <!-- ── Client quick start ── -->
+  <section>
+    <div class="label">Client</div>
+
+    <div class="snippet">
+      <div class="snippet-label">TypeScript · Browser or Node</div>
+      <pre><code>import { Open402Client } from '@open402/client'
+import { WebLNWallet } from '@open402/lightning'
+
+const client = new Open402Client({ wallet: new WebLNWallet() })
+
+// automatically handles 402, pays, and retries
+const res = await client.fetch('https://api.example.com/api/data')
+const data = await res.json()</code></pre>
+    </div>
+  </section>
+
+  <!-- ── Packages ── -->
+  <section>
+    <div class="label">Packages</div>
+    <ul class="pkg-list">
+      <li>
+        <span class="pkg-name">@open402/core</span>
+        <span class="pkg-desc">Protocol types, header parser, JWT receipt builder, discovery</span>
+      </li>
+      <li>
+        <span class="pkg-name">@open402/server</span>
+        <span class="pkg-desc">Express middleware, <code>/.well-known/402</code> routes, <code>paywall()</code></span>
+      </li>
+      <li>
+        <span class="pkg-name">@open402/client</span>
+        <span class="pkg-desc">Fetch wrapper with auto-pay, polling, and receipt caching</span>
+      </li>
+      <li>
+        <span class="pkg-name">@open402/lightning</span>
+        <span class="pkg-desc">Lightning Network adapters — LND REST, WebLN (Alby, Zeus)</span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ── Design ── -->
+  <section>
+    <div class="label">Design principles</div>
+
+    <h2>Currency-agnostic</h2>
+    <p>The protocol defines headers and a receipt format. Payment adapters are plug-in. Lightning ships first; any payment rail can implement the interface.</p>
+
+    <h2 style="margin-top:20px">Self-verifying receipts</h2>
+    <p>Receipts are ES256 JWTs signed by the server's own keypair, published at <code>GET /.well-known/402</code>. No central authority. No third-party verification service.</p>
+
+    <h2 style="margin-top:20px">Interoperable</h2>
+    <p>The <a href="https://github.com/baiehclaca/open402/blob/main/spec/open402.md">protocol spec</a> is language-agnostic. Any HTTP server can issue 402s. Any HTTP client can pay them.</p>
+  </section>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <span>open402 · MIT License</span>
+    <div style="display:flex;gap:20px">
+      <a href="https://github.com/baiehclaca/open402">GitHub</a>
+      <a href="https://github.com/baiehclaca/open402/blob/main/spec/open402.md">Spec</a>
+      <a href="https://github.com/baiehclaca/open402/blob/main/README.md">Docs</a>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>
