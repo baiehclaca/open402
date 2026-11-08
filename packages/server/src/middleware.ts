@@ -22,7 +22,7 @@ export function paywall(server: Open402Server, options: PaywallOptions & { path:
     const receiptHeader = req.headers['payment-receipt']
 
     if (typeof receiptHeader === 'string' && receiptHeader.length > 0) {
-      const valid = await server.verifyReceiptJwt(receiptHeader)
+      const valid = await server.verifyReceiptFor(receiptHeader, path, { amount, currency })
       if (valid) {
         next()
         return

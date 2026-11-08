@@ -106,6 +106,26 @@ export class Open402Server {
     return result !== null
   }
 
+  /**
+   * Verify a receipt AND that it pays for this resource at this price.
+   * A signature alone only proves *some* payment happened.
+   */
+  async verifyReceiptFor(
+    jwt: string,
+    resource: string,
+    price: { amount: number; currency: string },
+  ): Promise<boolean> {
+    const receipt = await verifyReceipt(jwt, this.publicKey)
+    if (!receipt) return false
+    const path = resource.split('?')[0] ?? resource
+    return (
+      receipt.sub === path &&
+      receipt.cur === price.currency &&
+      typeof receipt.amt === 'number' &&
+      receipt.amt >= price.amount
+    )
+  }
+
   async signTestReceipt(resource: string): Promise<string> {
     return buildReceipt(
       { txid: 'test', method: 'lightning', amount: 1000, currency: 'BTC' },

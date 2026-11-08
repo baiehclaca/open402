@@ -39,7 +39,7 @@ export async function verifyReceipt(
   publicKey: KeyLike,
 ): Promise<PaymentReceipt | null> {
   try {
-    const { payload } = await jwtVerify(jwt, publicKey)
+    const { payload } = await jwtVerify(jwt, publicKey, { algorithms: ['ES256'] })
     return payload as unknown as PaymentReceipt
   } catch {
     return null
