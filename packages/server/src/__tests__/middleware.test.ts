@@ -22,6 +22,23 @@ describe('paywall middleware', () => {
       paywall(server, { path: '/api/data', amount: 1000, currency: 'BTC' }),
       (_req, res) => { res.json({ secret: 'the data' }) },
     )
+    app.get(
+      '/api/premium',
+      paywall(server, { path: '/api/premium', amount: 50000, currency: 'BTC' }),
+      (_req, res) => { res.json({ secret: 'premium' }) },
+    )
+  })
+
+  it('rejects a receipt bought for a different (cheaper) resource', async () => {
+    const jwt = await server.signTestReceipt('/api/data')
+    const res = await request(app).get('/api/premium').set('Payment-Receipt', jwt)
+    expect(res.status).toBe(401)
+  })
+
+  it('rejects a receipt whose amount is below the price', async () => {
+    const jwt = await server.signTestReceipt('/api/premium')
+    const res = await request(app).get('/api/premium').set('Payment-Receipt', jwt)
+    expect(res.status).toBe(401)
   })
 
   it('returns 402 with payment headers when no receipt provided', async () => {
